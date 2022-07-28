@@ -14,14 +14,26 @@ import { CodeBox } from 'rc-codebox';
 
 export default () => {
   const [code, setCode] = useState('');
-  const onChange = (code) => {
-    setCode(code);
+  const [error, setError] = useState(false);
+
+  const onChange = (e: string) => {
+    if (e.length !== 6) {
+      setError(false);
+    }
+    setCode(e);
+  };
+
+  const onSubmit = (e: string) => {
+    if (e === '111111') {
+      setError(e);
+    }
   };
 
   return (
     <div>
       <h3>现在输入的code是：{code}</h3>
-      <CodeBox className="demo" onChange={onChange}></CodeBox>
+      <h4>输入 111111 会报错</h4>
+      <CodeBox len={6} onChange={onChange} onSubmit={onSubmit} error={error}></CodeBox>
     </div>
   );
 };

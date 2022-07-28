@@ -1,17 +1,23 @@
-.code-box {
+.codeBox {
   display: flex;
   flex-direction: row;
-  &-input {
-    width: 30px;
+  .codeBoxInput {
+    width: 48px;
+    height: 48px;
     margin-right: 10px;
     color: #333;
-    font-size: 36px;
+    font-size: 18px;
     text-align: center;
-    border: none;
-    border-bottom: 2px solid #ccc;
+    border: 1px solid rgba(28, 36, 46, 0.2);
+    border-radius: 4px;
     outline: none;
-    &.has-string {
-      border-color: #575866;
-    }
+  }
+  .hasString {
+    border: 1px solid #4477ee;
+  }
+  .hasError {
+    background: rgba(255, 116, 116, 0.05);
+    border: 1px solid #ff7474;
+    border-radius: 4px;
   }
 }

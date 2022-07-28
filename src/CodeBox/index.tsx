@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+/* eslint-disable no-unused-expressions */
 /**
  * @file: 验证码输入框
  * @author: huxiaoshuai
@@ -6,8 +8,10 @@
  * @LastEditTime: 2022-01-12 19:51:57
  */
 
-import React, { useRef, useEffect } from 'react';
-import './index.less';
+import React, { useRef, useEffect, useState } from 'react';
+// @ts-ignore
+import classnames from 'classnames';
+import styles from './index.less';
 
 interface CodeBoxProps {
   /**
@@ -31,13 +35,22 @@ interface CodeBoxProps {
    * @default true
    */
   autoFocus?: boolean;
+  /**
+   * @description 当用户输入完整时会调用此方法
+   */
+  onSubmit?: (code: string) => void;
+  /**
+   * @description 错误标识
+   * @default false
+   */
+  error?: boolean;
 }
 
 export function CodeBox(props: CodeBoxProps) {
-  const { len = 6, onChange, className = '', autoFocus = true } = props;
+  const { len = 6, onChange, className = '', autoFocus = true, onSubmit, error = false } = props;
 
   // 输入框数组
-  const inputArr = new Array(len).fill('');
+  const [inputArr, setInputArr] = useState<string[]>(new Array(len).fill(''));
 
   // 输入框ref
   const inputRefs = useRef<any>([]);
@@ -71,6 +84,8 @@ export function CodeBox(props: CodeBoxProps) {
           e.preventDefault();
         }
         break;
+      default:
+        break;
     }
   };
 
@@ -81,13 +96,16 @@ export function CodeBox(props: CodeBoxProps) {
    */
   const onInputValueChange = (index: number, e: any) => {
     let code = '';
+    const inp: string[] = [];
     inputRefs.current?.forEach((ref: any) => {
       if (ref?.value) {
         code += ref?.value;
       } else {
-        code += ' ';
+        code += '';
       }
+      inp.push(ref?.value || '');
     });
+    setInputArr(inp);
 
     // 判断是删除操作
     if (index > 0 && !e.target.value) {
@@ -100,16 +118,8 @@ export function CodeBox(props: CodeBoxProps) {
       const nextInputRef = inputRefs.current[index + 1];
       nextInputRef.focus();
     }
-
+    if (onSubmit && code.length === len) onSubmit(code);
     onChange && onChange(code);
-  };
-
-  const getInputClassName = (index: number) => {
-    const currentInputRef = inputRefs.current[index];
-    const value = currentInputRef?.value;
-    const defaultClassName = 'code-box-input';
-
-    return value ? defaultClassName + ' has-string' : defaultClassName;
   };
 
   useEffect(() => {
@@ -119,19 +129,27 @@ export function CodeBox(props: CodeBoxProps) {
   }, [autoFocus]);
 
   return (
-    <div className={className ? `code-box ${className}` : 'code-box'}>
-      {inputArr.map((v, index) => {
+    <div
+      className={classnames(className, {
+        [styles.codeBox]: true,
+      })}
+    >
+      {(inputArr || []).map((v, index) => {
         return (
           <input
             ref={getRef}
             maxLength={1}
-            className={getInputClassName(index)}
+            className={classnames({
+              [styles.codeBoxInput]: true,
+              [styles.hasString]: v && !error,
+              [styles.hasError]: error,
+            })}
             key={index}
             type="text"
             onFocus={() => {
               inputRefs.current[index].select();
             }}
-            onKeyDown={(e) => {
+            onKeyDown={(e: any) => {
               onInputKeyDown(e, index);
             }}
             onChange={(e) => {
